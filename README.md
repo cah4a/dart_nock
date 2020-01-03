@@ -268,25 +268,35 @@ final interceptor = nock.get("/auth")
 
 ### Persistent requests
 
-To repeat responses for as long as nock is active, use `.persist()`
+To repeat responses for as long as nock is active, use `.persist()`.
 
 ```dart
-final blogs = nock.get("/tags")
-  ..replay(
-    200,
-    "result",
-  );
-
-// only one request to http://localhost/api/tags will succeed
-
 final users = nock.get("/users")
   ..persist()
   ..replay(
     200,
     "result",
   );
+```
 
-// all requests to http://localhost/api/users will succeed
+Note that while a persisted mock will always intercept the requests, it is considered "done" after the first interception.
+
+Canceling pending mock:
+
+```dart
+users.cancel();
+```
+
+### Do something after reply
+
+```dart
+final users = nock.get("/users")
+  ..persist()
+  ..replay(
+    200,
+    "result",
+  )
+  ..onReply(() => print("I'm done"));
 ```
 
 ### Contributions Welcome!

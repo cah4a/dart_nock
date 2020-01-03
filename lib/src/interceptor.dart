@@ -25,6 +25,11 @@ class Registry {
 
   void add(Interceptor interceptor) => _interceptors.add(interceptor);
 
+  void remove(Interceptor interceptor) {
+    _interceptors.remove(interceptor);
+    interceptor._onReply?.close();
+  }
+
   Interceptor match(HttpClientRequest request) {
     final interceptor = _interceptors.firstWhere(
       (interceptor) => interceptor._matcher.match(request),
@@ -40,11 +45,14 @@ class Registry {
 
   void completed(Interceptor interceptor) {
     interceptor._isDone = true;
+    interceptor._onReply?.add(null);
 
     if (!interceptor.isPersist) {
-      _interceptors.remove(interceptor);
+      remove(interceptor);
     }
   }
+
+  contains(Interceptor interceptor) => _interceptors.contains(interceptor);
 }
 
 typedef dynamic ExceptionThrower();
@@ -59,21 +67,29 @@ class Interceptor {
 
   bool _isPersist = false;
   bool _isDone = false;
-  bool _isSync = true;
-  Completer _completer;
+  bool _isRegistered = false;
+  bool _isCanceled = false;
+
+  StreamController _onReply;
 
   Interceptor(this._matcher);
 
   bool get isDone => _isDone;
 
-  bool _registered = false;
+  bool get isActive => registry.contains(this);
+
+  bool get isPersist => _isPersist;
 
   _register() {
-    if (_registered) {
+    if (_isCanceled) {
+      throw AlreadyCanceled(this);
+    }
+
+    if (_isRegistered) {
       throw AlreadyRegistered(this);
     }
 
-    _registered = true;
+    _isRegistered = true;
     registry.add(this);
   }
 
@@ -103,8 +119,6 @@ class Interceptor {
 
   void headers(Map<String, dynamic> headers) =>
       _matcher.headers.expected = headers;
-
-  bool get isPersist => _isPersist;
 
   void replay(int statusCode, dynamic body, {Map<String, String> headers}) {
     this.statusCode = statusCode;
@@ -143,7 +157,7 @@ class Interceptor {
       def += " +b";
     }
 
-    if (!_registered) {
+    if (!_isRegistered) {
       return def;
     }
 
@@ -160,12 +174,23 @@ class Interceptor {
     return def;
   }
 
-  complete() => _completer?.complete();
-}
+  void cancel() {
+    _isCanceled = true;
 
-Future whenCompleted(Interceptor interceptor) async {
-  if (!interceptor._isSync) {
-    interceptor._completer = Completer();
-    return interceptor._completer.future;
+    if (_isRegistered) {
+      registry.remove(this);
+      _onReply?.close();
+    }
+  }
+
+  void onReply(callback()) {
+    if (!isActive) {
+      throw MockIsNotActive(this);
+    }
+
+    _onReply ??= StreamController.broadcast();
+    _onReply.stream.listen((_) {
+      callback();
+    });
   }
 }

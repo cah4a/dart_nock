@@ -40,6 +40,24 @@ class AlreadyRegistered implements Exception {
   String toString() => "Request ${interceptor} already registered";
 }
 
+class AlreadyCanceled implements Exception {
+  final dynamic interceptor;
+
+  AlreadyCanceled(this.interceptor);
+
+  @override
+  String toString() => "Request ${interceptor} was canceled";
+}
+
+class MockIsNotActive implements Exception {
+  final dynamic interceptor;
+
+  MockIsNotActive(this.interceptor);
+
+  @override
+  String toString() => "Request ${interceptor} is not active";
+}
+
 class UnknownBodyType implements Exception {
   final body;
 

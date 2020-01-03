@@ -146,8 +146,6 @@ class MockHttpClientRequest extends HttpClientRequest {
       throw NetConnectionNotAllowed(this, registry.pendingMocks);
     }
 
-    await whenCompleted(interceptor);
-
     registry.completed(interceptor);
 
     if (interceptor.exception != null) {
@@ -190,7 +188,7 @@ class MockHttpClientRequest extends HttpClientRequest {
 
   @override
   Future flush() {
-    // huftodo
+    // nuftodo
     return null;
   }
 

@@ -77,6 +77,47 @@ void main() {
     }
   });
 
+  test("cancel", () async {
+    final result = {"foo": "bar"};
+
+    final interceptor = nock("http://127.0.0.1").get("/subpath")
+      ..replay(
+        200,
+        result,
+      );
+
+    interceptor.cancel();
+
+    final request = await client.getUrl(Uri.parse("http://127.0.0.1/subpath"));
+
+    expect(
+      request.close(),
+      throwsA(TypeMatcher<NetConnectionNotAllowed>()),
+    );
+  });
+
+  test("on complete", () async {
+    final result = {"foo": "bar"};
+
+    final interceptor = nock("http://127.0.0.1").get("/subpath")
+      ..replay(
+        200,
+        result,
+      );
+
+    bool isCompleted = false;
+
+    interceptor.onReply(() {
+      isCompleted = true;
+    });
+
+    final request = await client.getUrl(Uri.parse("http://127.0.0.1/subpath"));
+
+    expect(isCompleted, false);
+    await request.close();
+    expect(isCompleted, true);
+  });
+
   test("persist", () async {
     final result = {"foo": "bar"};
 
