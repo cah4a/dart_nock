@@ -50,7 +50,7 @@ class MockHttpHeaders implements HttpHeaders {
     return values[0];
   }
 
-  void add(String name, value) {
+  void add(String name, value, {bool preserveHeaderCase = false}) {
     _checkMutable();
     _addAll(_validateField(name), value);
   }
@@ -66,7 +66,7 @@ class MockHttpHeaders implements HttpHeaders {
     }
   }
 
-  set(String name, Object value) {
+  set(String name, Object value, {bool preserveHeaderCase = false}) {
     _checkMutable();
     name = _validateField(name);
     _headers.remove(name);
