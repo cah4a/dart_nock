@@ -1,6 +1,6 @@
 name: nock
 description: HTTP requests mocking library for dart and flutter. Test your application in isolation.
-version: 1.0.1+1
+version: 1.0.2
 homepage: https://github.com/cah4a/dart_nock
 
 environment:
@@ -11,5 +11,5 @@ dependencies:
   collection: ^1.14.0
 
 dev_dependencies:
-  http: any
+  http: ^0.12.0
   pedantic: any
