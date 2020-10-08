@@ -173,6 +173,11 @@ class MockHttpClientRequest extends HttpClientRequest {
   }
 
   @override
+  void abort([Object exception, StackTrace stackTrace]) {
+      // what should we do with that?
+  }
+
+  @override
   Future addStream(Stream<List<int>> stream) async {
     await stream.forEach(add);
   }
