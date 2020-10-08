@@ -12,7 +12,7 @@ Add dev dependency to your `pubspec.yaml`:
 
 ```yaml
 dev_dependencies:
-  nock: ^1.0.0
+  nock: ^1.1.0
 ```
 
 ## Basic usage example:
@@ -33,7 +33,7 @@ void main() {
 
   test("example", () async {
     final interceptor = nock("http://localhost/api").get("/users")
-      ..replay(
+      ..reply(
         200,
         "result",
       );
@@ -90,7 +90,7 @@ void main(){
     nock.defaultBase = "http://localhost/api";
     nock.init();
   });
-  
+
   test("example", () async {
     nock.get("/users"); // create mock for GET http://localhost/api/users
   });
@@ -103,13 +103,13 @@ You could use strings, regexp or any matcher from [package:test](https://pub.dev
 
 ```dart
 final topicsInterceptor = nock.get("/topics")
-  ..replay(200);
+  ..reply(200);
 
 final usersInterceptor = nock.get(startsWith("/users"))
-  ..replay(200);
+  ..reply(200);
 
 final tagsInterceptor = nock.get(RegExp(r"^/tags$"))
-  ..replay(200);
+  ..reply(200);
 ```
 
 ### Specifying request headers
@@ -119,17 +119,17 @@ final interceptor = nock.get("/users")
   ..headers({
     'Session-Token': '59aff48f-369e-4781-a142-b52666cf141f',
   })
-  ..replay(200);
+  ..reply(200);
 ```
 
 ### Specifying request query string
 
-Using query string: 
+Using query string:
 
 ```dart
 final interceptor = nock.get("/users")
   ..query("ids[]=1&ids[]=2")
-  ..replay(200);
+  ..reply(200);
 ```
 
 Using example:
@@ -137,7 +137,7 @@ Using example:
 ```dart
 final interceptor = nock.get("/users")
   ..query({"id": 5})
-  ..replay(200);
+  ..reply(200);
 ```
 
 Using matchers:
@@ -145,11 +145,11 @@ Using matchers:
 ```dart
 final interceptor = nock.get("/users")
   ..query(startsWith("something"))
-  ..replay(200);
+  ..reply(200);
 
 final interceptor = nock.get("/users")
   ..query({'id': anyOf([1, 2, 3])})
-  ..replay(200);
+  ..reply(200);
 ```
 
 Using custom match function:
@@ -157,13 +157,13 @@ Using custom match function:
 ```dart
 final interceptor = nock.get("/users")
   ..query((Map<String, List<String>> params) => true)
-  ..replay(200);
+  ..reply(200);
 
 // or
 
 final interceptor = nock.get("/users")
   ..query((Map<String, String> params) => true)
-  ..replay(200);
+  ..reply(200);
 ```
 
 ### Specifying request body
@@ -171,7 +171,7 @@ final interceptor = nock.get("/users")
 Interceptor will parse HTTP request headers and try parse body.
 
 Supported mime-types:
-- `application/x-www-form-urlencoded` 
+- `application/x-www-form-urlencoded`
 - `application/json`
 - `application/text`
 - `application/text`
@@ -180,47 +180,47 @@ Using example:
 
 ```dart
 final interceptor = nock.post(
-    "/users", 
+    "/users",
     {
       "name": "John",
       "email": "john_doe@gmail.com",
     },
 )
-  ..replay(204);
+  ..reply(204);
 ```
 
 Using matchers:
 
 ```dart
 final interceptor = nock.post(
-    "/users", 
+    "/users",
     {
       id: anyOf([1, 2, 3])
       name: any,
       email: TypedMather<String>(),
     },
 )
-  ..replay(204);
+  ..reply(204);
 ```
 
 Using custom match function:
 
 ```dart
 final interceptor = nock.post(
-    "/users", 
+    "/users",
     (body) => body is Map,
 )
-  ..replay(204);
+  ..reply(204);
 ```
 
 If you send binary data you could use custom raw match function:
 
 ```dart
 final interceptor = nock.post(
-    "/users", 
+    "/users",
     (List<int> body) => true,
 )
-  ..replay(204);
+  ..reply(204);
 ```
 
 ### Specifying reply
@@ -229,7 +229,7 @@ application/json:
 
 ```dart
 final interceptor = nock.get("/users")
-  ..replay(200, [
+  ..reply(200, [
     {
       "id": 1,
       "name": "John",
@@ -246,13 +246,13 @@ final interceptor = nock.get("/users")
 text/plain:
 ```dart
 final interceptor = nock.get("/ping")
-  ..replay(200, "pong");
+  ..reply(200, "pong");
 ```
 
 Other binary data:
 ```dart
 final interceptor = nock.get("/video")
-  ..replay(200, <int>[73, 32, 97, 109, 32, 118, 105, 100, 101, 111]);
+  ..reply(200, <int>[73, 32, 97, 109, 32, 118, 105, 100, 101, 111]);
 ```
 
 ### Specifying reply headers
@@ -260,7 +260,7 @@ final interceptor = nock.get("/video")
 Other binary data:
 ```dart
 final interceptor = nock.get("/auth")
-  ..replay(204, null, {
+  ..reply(204, null, {
     "Session-Token": "59aff48f-369e-4781-a142-b52666cf141f",
   });
 ```
@@ -273,7 +273,7 @@ To repeat responses for as long as nock is active, use `.persist()`.
 ```dart
 final users = nock.get("/users")
   ..persist()
-  ..replay(
+  ..reply(
     200,
     "result",
   );
@@ -292,7 +292,7 @@ users.cancel();
 ```dart
 final users = nock.get("/users")
   ..persist()
-  ..replay(
+  ..reply(
     200,
     "result",
   )

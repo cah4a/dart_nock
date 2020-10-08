@@ -16,7 +16,7 @@ void main() {
 
   test("straight forward", () async {
     nock("http://127.0.0.1").get("/subpath")
-      ..replay(
+      ..reply(
         200,
         "result",
       );
@@ -31,7 +31,7 @@ void main() {
 
   test("connection not allowed", () async {
     nock("http://127.0.0.1").get("/subpath")
-      ..replay(
+      ..reply(
         200,
         "something",
       );
@@ -52,7 +52,7 @@ void main() {
     final result = {"foo": "bar"};
 
     nock("http://127.0.0.1").get("/subpath")
-      ..replay(
+      ..reply(
         200,
         result,
       );
@@ -81,7 +81,7 @@ void main() {
     final result = {"foo": "bar"};
 
     final interceptor = nock("http://127.0.0.1").get("/subpath")
-      ..replay(
+      ..reply(
         200,
         result,
       );
@@ -100,7 +100,7 @@ void main() {
     final result = {"foo": "bar"};
 
     final interceptor = nock("http://127.0.0.1").get("/subpath")
-      ..replay(
+      ..reply(
         200,
         result,
       );
@@ -123,7 +123,7 @@ void main() {
 
     final scope = nock("http://127.0.0.1").get("/subpath")
       ..persist()
-      ..replay(
+      ..reply(
         200,
         result,
       );
@@ -160,7 +160,7 @@ void main() {
   test("query", () async {
     nock("http://127.0.0.1").get("/subpath")
       ..query({"a": "1"})
-      ..replay(
+      ..reply(
         200,
         "something",
       );
@@ -190,7 +190,7 @@ void main() {
     final data = {'data': 1234};
 
     nock("http://127.0.0.1").post("/subpath", data)
-      ..replay(
+      ..reply(
         200,
         "something",
       );
@@ -223,7 +223,7 @@ void main() {
   test("request headers", () async {
     nock("http://127.0.0.1").get("/subpath")
       ..headers({"foo": "bar"})
-      ..replay(
+      ..reply(
         200,
         "baz",
       );
@@ -250,9 +250,9 @@ void main() {
     }
   });
 
-  test("replay headers", () async {
+  test("reply headers", () async {
     nock("http://127.0.0.1").get("/subpath")
-      ..replay(
+      ..reply(
         200,
         "foobar",
         headers: {'foo': 'bar'},

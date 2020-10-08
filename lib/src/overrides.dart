@@ -153,7 +153,7 @@ class MockHttpClientRequest extends HttpClientRequest {
     }
 
     final headers = MockHttpHeaders('1.1');
-    interceptor.replayHeaders?.forEach((key, value) => headers.add(key, value));
+    interceptor.replyHeaders?.forEach((key, value) => headers.add(key, value));
 
     return MockHttpClientResponse(
       headers,

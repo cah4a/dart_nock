@@ -60,7 +60,7 @@ typedef dynamic ExceptionThrower();
 class Interceptor {
   final RequestMatcher _matcher;
 
-  Map<String, String> replayHeaders;
+  Map<String, String> replyHeaders;
   int statusCode;
   dynamic body;
   Function exception;
@@ -120,10 +120,18 @@ class Interceptor {
   void headers(Map<String, dynamic> headers) =>
       _matcher.headers.expected = headers;
 
+  /// Type problems.
+  /// Will be removed in next versions.
+  /// Use [reply] method.
+  @deprecated
   void replay(int statusCode, dynamic body, {Map<String, String> headers}) {
+    reply(statusCode, body, headers: headers);
+  }
+
+  void reply(int statusCode, dynamic body, {Map<String, String> headers}) {
     this.statusCode = statusCode;
     this.body = body;
-    this.replayHeaders = headers;
+    this.replyHeaders = headers;
     _register();
   }
 

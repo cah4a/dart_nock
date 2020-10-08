@@ -13,7 +13,7 @@ void main() {
 
   test("example", () async {
     final interceptor = nock("http://localhost/api").get("/users")
-      ..replay(
+      ..reply(
         200,
         "result",
       );
