@@ -132,6 +132,11 @@ void main() {
         actual: "/some/url",
         result: true,
       ),
+      _Case(
+        expected: startsWith("/some/url?value="),
+        actual: "/some/url?value=12312312",
+        result: true,
+      ),
     ];
 
     cases.forEach((c) {

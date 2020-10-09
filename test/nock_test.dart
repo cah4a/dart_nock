@@ -29,6 +29,21 @@ void main() {
     expect(body.join(), "result");
   });
 
+  test("using matchers for urls", () async {
+    nock("http://127.0.0.1").get(startsWith("/subpath?ref="))
+      ..reply(
+        200,
+        "result",
+      );
+
+    final request = await client.getUrl(Uri.parse("http://127.0.0.1/subpath?ref=XpKeURAAACzK17lv"));
+    final response = await request.close();
+    final body = await response.transform(utf8.decoder).toList();
+
+    expect(response.statusCode, 200);
+    expect(body.join(), "result");
+  });
+
   test("connection not allowed", () async {
     nock("http://127.0.0.1").get("/subpath")
       ..reply(

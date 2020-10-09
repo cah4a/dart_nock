@@ -137,6 +137,13 @@ class UriMatcher {
       return _path(uri);
     }
 
+    if (_path is Matcher && _query == null) {
+      if (_path.matches(uri.toString().replaceAll(_base, ""), {})) {
+        // case when query parameters was matching inside _path matcher
+        return true;
+      }
+    }
+
     if (!_matchUrl(uri)) {
       return false;
     }

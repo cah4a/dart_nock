@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.2
+
+- Add ability to pass url matcher with query parameters inside
+
+## 1.1.1
+
+- Fix body matcher to correctly behave with matchers
+
 ## 1.1.0
 
 - Dart 2.10 support
