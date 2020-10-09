@@ -69,6 +69,11 @@ void main() {
         result: true,
         contentType: ContentType.json,
       ),
+      _Case(
+        expected: anything,
+        actual: '',
+        result: true,
+      ),
     ];
 
     cases.forEach((c) {

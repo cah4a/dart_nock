@@ -186,6 +186,37 @@ void main() {
     }
   });
 
+  test("post match", () async {
+    nock("http://127.0.0.1").post("/subpath", anything)
+      ..persist()
+      ..reply(
+        200,
+        "something",
+      );
+
+    final uri = Uri.parse("http://127.0.0.1/subpath");
+
+    {
+      final req = await client.postUrl(uri);
+      final response = await req.close();
+      final body = await response.transform(utf8.decoder).toList();
+      expect(body.join(), "something");
+    }
+
+    {
+      final uri = Uri.parse("http://127.0.0.1/subpath");
+      final req = await client.postUrl(uri);
+
+      req.headers.contentType = ContentType.json;
+      req.write(json.encode({"spongebob": "square pants"}));
+
+      final response = await req.close();
+      final body = await response.transform(utf8.decoder).toList();
+
+      expect(body.join(), "something");
+    }
+  });
+
   test("body match", () async {
     final data = {'data': 1234};
 

@@ -45,15 +45,15 @@ class BodyMatcher {
       return _matchUrlEncoded(Uri(query: data));
     }
 
-    if (contentType?.mimeType == "application/json") {
-      return _matchJson(data);
+    if (expected is RegExp && data is String) {
+      return expected.hasMatch(data);
     }
 
-    if (data is String) {
-      return _matchString(data);
+    if (expected is Matcher) {
+      return expected.matches(data, {});
     }
 
-    return false;
+    return equals(expected).matches(data, {});
   }
 
   dynamic _content(List<int> request, ContentType contentType) {
@@ -69,22 +69,6 @@ class BodyMatcher {
       default:
         return request;
     }
-  }
-
-  bool _matchString(String data) {
-    if (expected is RegExp) {
-      return expected.hasMatch(data);
-    }
-
-    return expected == data;
-  }
-
-  bool _matchJson(data) {
-    if (expected is Matcher) {
-      return expected.matches(data, {});
-    }
-
-    return equals(expected).matches(data, {});
   }
 
   bool _matchUrlEncoded(Uri uri) {

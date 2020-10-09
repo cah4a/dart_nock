@@ -12,7 +12,7 @@ Add dev dependency to your `pubspec.yaml`:
 
 ```yaml
 dev_dependencies:
-  nock: ^1.1.0
+  nock: ^1.1.1
 ```
 
 ## Basic usage example:
