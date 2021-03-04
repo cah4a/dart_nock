@@ -2,8 +2,8 @@ part of 'interceptor.dart';
 
 Function deepEq = const DeepCollectionEquality().equals;
 
-typedef bool MatcherFn<T>(T uri);
-typedef bool BodyRawMatchFn(List<int> body, ContentType contentType);
+typedef MatcherFn<T> = bool Function(T uri);
+typedef BodyRawMatchFn = bool Function(List<int> body, ContentType contentType);
 
 class RequestMatcher {
   final String method;
@@ -15,9 +15,9 @@ class RequestMatcher {
 
   bool match(MockHttpClientRequest request) {
     return method.toUpperCase() == request.method.toUpperCase() &&
-        uri.match(request.uri) &&
+        uri.match(request.uri)! &&
         headers.match(request.headers) &&
-        body.match(request.body, request.headers.contentType);
+        body.match(request.body, request.headers.contentType)!;
   }
 }
 
@@ -26,7 +26,7 @@ class BodyMatcher {
 
   BodyMatcher(this.expected);
 
-  bool match(List<int> request, ContentType contentType) {
+  bool? match(List<int> request, ContentType? contentType) {
     if (expected == null) {
       return request.isEmpty;
     }
@@ -41,7 +41,7 @@ class BodyMatcher {
 
     final data = _content(request, contentType);
 
-    if (contentType?.mimeType == "application/x-www-form-urlencoded") {
+    if (contentType?.mimeType == 'application/x-www-form-urlencoded') {
       return _matchUrlEncoded(Uri(query: data));
     }
 
@@ -56,22 +56,22 @@ class BodyMatcher {
     return equals(expected).matches(data, {});
   }
 
-  dynamic _content(List<int> request, ContentType contentType) {
-    if (contentType == null || contentType.primaryType == "text") {
+  dynamic _content(List<int> request, ContentType? contentType) {
+    if (contentType == null || contentType.primaryType == 'text') {
       return utf8.decode(request);
     }
 
-    switch (contentType?.mimeType ?? "text/plain") {
-      case "application/x-www-form-urlencoded":
+    switch (contentType.mimeType) {
+      case 'application/x-www-form-urlencoded':
         return utf8.decode(request);
-      case "application/json":
+      case 'application/json':
         return json.decode(utf8.decode(request));
       default:
         return request;
     }
   }
 
-  bool _matchUrlEncoded(Uri uri) {
+  bool? _matchUrlEncoded(Uri uri) {
     if (expected is MatcherFn<Map<String, List<String>>>) {
       return expected(uri.queryParametersAll);
     }
@@ -93,22 +93,10 @@ class BodyMatcher {
 }
 
 class UriMatcher {
-  String definition;
-  String _base;
-  dynamic _path;
+  final String _base;
+  late dynamic _path;
+  late String definition;
   dynamic _query;
-
-  set expected(dynamic query) {
-    if (query is! String &&
-        query is! Map<String, dynamic> &&
-        query is! Matcher &&
-        query is! MatcherFn<Map<String, String>> &&
-        query is! MatcherFn<Map<String, List<String>>>) {
-      throw UnknownQueryMatcherType(query);
-    }
-
-    _query = query;
-  }
 
   UriMatcher(this._base, path) {
     if (path is! Uri &&
@@ -123,12 +111,24 @@ class UriMatcher {
       _path = Uri.parse(_base + path);
       definition = _path.toString();
     } else {
-      definition = "$_base/$_path";
       _path = path;
+      definition = '$_base/$_path';
     }
   }
 
-  bool match(Uri uri) {
+  set expected(dynamic query) {
+    if (query is! String &&
+        query is! Map<String, dynamic> &&
+        query is! Matcher &&
+        query is! MatcherFn<Map<String, String>> &&
+        query is! MatcherFn<Map<String, List<String>>>) {
+      throw UnknownQueryMatcherType(query);
+    }
+
+    _query = query;
+  }
+
+  bool? match(Uri uri) {
     if (!uri.toString().startsWith(_base)) {
       return false;
     }
@@ -138,13 +138,13 @@ class UriMatcher {
     }
 
     if (_path is Matcher && _query == null) {
-      if (_path.matches(uri.toString().replaceAll(_base, ""), {})) {
+      if (_path.matches(uri.toString().replaceAll(_base, ''), {})) {
         // case when query parameters was matching inside _path matcher
         return true;
       }
     }
 
-    if (!_matchUrl(uri)) {
+    if (!_matchUrl(uri)!) {
       return false;
     }
 
@@ -193,7 +193,7 @@ class UriMatcher {
     return _query;
   }
 
-  bool _matchUrl(Uri uri) {
+  bool? _matchUrl(Uri uri) {
     final normalizedUri = _normalize(uri);
 
     if (_path is Uri) {
@@ -201,11 +201,11 @@ class UriMatcher {
     }
 
     if (_path is Matcher) {
-      return _path.matches(normalizedUri.toString().replaceAll(_base, ""), {});
+      return _path.matches(normalizedUri.toString().replaceAll(_base, ''), {});
     }
 
     if (_path is RegExp) {
-      return _path.hasMatch(normalizedUri.toString().replaceAll(_base, ""));
+      return _path.hasMatch(normalizedUri.toString().replaceAll(_base, ''));
     }
 
     return false;
@@ -213,7 +213,7 @@ class UriMatcher {
 }
 
 class HeadersMatcher {
-  Map<String, dynamic> expected;
+  Map<String, dynamic>? expected;
 
   HeadersMatcher([this.expected]);
 
@@ -222,12 +222,12 @@ class HeadersMatcher {
       return true;
     }
 
-    return expected.keys.every(
-      (header) => _matchHeader(expected[header], headers[header]),
+    return expected!.keys.every(
+      (header) => _matchHeader(expected![header], headers[header]),
     );
   }
 
-  bool _matchHeader(expected, List<String> actual) {
+  bool _matchHeader(expected, List<String>? actual) {
     if (actual == null) {
       return expected == null;
     }

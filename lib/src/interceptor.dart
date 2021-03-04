@@ -1,16 +1,15 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:test/test.dart';
-
 import 'package:collection/collection.dart';
+import 'package:test/test.dart';
 
 import 'overrides.dart' show MockHttpClientRequest;
 import 'exceptions.dart';
 
 part 'request_matcher.dart';
 
-final Registry registry = Registry();
+final registry = Registry();
 
 class Registry {
   final _interceptors = <Interceptor>[];
@@ -30,17 +29,14 @@ class Registry {
     interceptor._onReply?.close();
   }
 
-  Interceptor match(HttpClientRequest request) {
-    final interceptor = _interceptors.firstWhere(
-      (interceptor) => interceptor._matcher.match(request),
-      orElse: () => null,
-    );
-
-    if (interceptor == null) {
-      return null;
+  Interceptor? match(HttpClientRequest request) {
+    for (var interceptor in _interceptors) {
+      if (interceptor._matcher.match(request as MockHttpClientRequest)) {
+        return interceptor;
+      }
     }
 
-    return interceptor;
+    return null;
   }
 
   void completed(Interceptor interceptor) {
@@ -52,25 +48,25 @@ class Registry {
     }
   }
 
-  contains(Interceptor interceptor) => _interceptors.contains(interceptor);
+  bool contains(Interceptor interceptor) => _interceptors.contains(interceptor);
 }
 
-typedef dynamic ExceptionThrower();
+typedef ExceptionThrower = void Function();
 
 class Interceptor {
   final RequestMatcher _matcher;
 
-  Map<String, String> replyHeaders;
-  int statusCode;
+  Map<String, String>? replyHeaders;
+  late int statusCode;
   dynamic body;
-  Function exception;
+  Function? exception;
 
   bool _isPersist = false;
   bool _isDone = false;
   bool _isRegistered = false;
   bool _isCanceled = false;
 
-  StreamController _onReply;
+  StreamController? _onReply;
 
   Interceptor(this._matcher);
 
@@ -80,7 +76,7 @@ class Interceptor {
 
   bool get isPersist => _isPersist;
 
-  _register() {
+  void _register() {
     if (_isCanceled) {
       throw AlreadyCanceled(this);
     }
@@ -124,14 +120,14 @@ class Interceptor {
   /// Will be removed in next versions.
   /// Use [reply] method.
   @deprecated
-  void replay(int statusCode, dynamic body, {Map<String, String> headers}) {
+  void replay(int statusCode, dynamic body, {Map<String, String>? headers}) {
     reply(statusCode, body, headers: headers);
   }
 
-  void reply(int statusCode, dynamic body, {Map<String, String> headers}) {
+  void reply(int statusCode, dynamic body, {Map<String, String>? headers}) {
     this.statusCode = statusCode;
     this.body = body;
-    this.replyHeaders = headers;
+    replyHeaders = headers;
     _register();
   }
 
@@ -155,14 +151,14 @@ class Interceptor {
 
   @override
   String toString() {
-    String def = "${_matcher.method} ${_matcher.uri.definition}";
+    var def = '${_matcher.method} ${_matcher.uri.definition}';
 
     if (_matcher.uri._query != null) {
-      def += " +q";
+      def += ' +q';
     }
 
     if (_matcher.body.expected != null) {
-      def += " +b";
+      def += ' +b';
     }
 
     if (!_isRegistered) {
@@ -170,13 +166,13 @@ class Interceptor {
     }
 
     if (exception != null) {
-      return def + " throws ${exception()}";
+      return def + ' throws ${exception!()}';
     }
 
-    def += " -> $statusCode";
+    def += ' -> $statusCode';
 
     if (body != null) {
-      def += " $body";
+      def += ' $body';
     }
 
     return def;
@@ -191,13 +187,13 @@ class Interceptor {
     }
   }
 
-  void onReply(callback()) {
+  void onReply(void Function() callback) {
     if (!isActive) {
       throw MockIsNotActive(this);
     }
 
     _onReply ??= StreamController.broadcast();
-    _onReply.stream.listen((_) {
+    _onReply!.stream.listen((_) {
       callback();
     });
   }

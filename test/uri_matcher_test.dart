@@ -160,7 +160,7 @@ void main() {
         }
 
         expect(
-          matcher.match(Uri.parse(base + c.actual)),
+          matcher.match(Uri.parse(base + c.actual!)),
           c.result,
         );
       });
@@ -171,8 +171,8 @@ void main() {
 class _Case {
   final dynamic expected;
   final dynamic query;
-  final String actual;
-  final bool result;
+  final String? actual;
+  final bool? result;
 
   _Case({this.expected, this.actual, this.query, this.result});
 }

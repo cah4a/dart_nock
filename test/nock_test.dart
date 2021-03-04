@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 import 'package:nock/nock.dart';
 
 void main() {
-  HttpClient client;
+  late HttpClient client;
 
   setUpAll(nock.init);
 
@@ -14,65 +14,62 @@ void main() {
     client = HttpClient();
   });
 
-  test("straight forward", () async {
-    nock("http://127.0.0.1").get("/subpath")
-      ..reply(
-        200,
-        "result",
-      );
+  test('straight forward', () async {
+    nock('http://127.0.0.1').get('/subpath').reply(
+          200,
+          'result',
+        );
 
-    final request = await client.getUrl(Uri.parse("http://127.0.0.1/subpath"));
+    final request = await client.getUrl(Uri.parse('http://127.0.0.1/subpath'));
     final response = await request.close();
     final body = await response.transform(utf8.decoder).toList();
 
     expect(response.statusCode, 200);
-    expect(body.join(), "result");
+    expect(body.join(), 'result');
   });
 
-  test("using matchers for urls", () async {
-    nock("http://127.0.0.1").get(startsWith("/subpath?ref="))
-      ..reply(
-        200,
-        "result",
-      );
+  test('using matchers for urls', () async {
+    nock('http://127.0.0.1').get(startsWith('/subpath?ref=')).reply(
+          200,
+          'result',
+        );
 
-    final request = await client.getUrl(Uri.parse("http://127.0.0.1/subpath?ref=XpKeURAAACzK17lv"));
+    final request = await client
+        .getUrl(Uri.parse('http://127.0.0.1/subpath?ref=XpKeURAAACzK17lv'));
     final response = await request.close();
     final body = await response.transform(utf8.decoder).toList();
 
     expect(response.statusCode, 200);
-    expect(body.join(), "result");
+    expect(body.join(), 'result');
   });
 
-  test("connection not allowed", () async {
-    nock("http://127.0.0.1").get("/subpath")
-      ..reply(
-        200,
-        "something",
-      );
+  test('connection not allowed', () async {
+    nock('http://127.0.0.1').get('/subpath').reply(
+          200,
+          'something',
+        );
 
     {
-      final request = await client.getUrl(Uri.parse("http://127.0.0.1/other"));
+      final request = await client.getUrl(Uri.parse('http://127.0.0.1/other'));
       expect(request.close(), throwsA(TypeMatcher<NetConnectionNotAllowed>()));
     }
 
     {
       final request =
-          await client.postUrl(Uri.parse("http://127.0.0.1/subpath"));
+          await client.postUrl(Uri.parse('http://127.0.0.1/subpath'));
       expect(request.close(), throwsA(TypeMatcher<NetConnectionNotAllowed>()));
     }
   });
 
-  test("autoremove", () async {
-    final result = {"foo": "bar"};
+  test('autoremove', () async {
+    final result = {'foo': 'bar'};
 
-    nock("http://127.0.0.1").get("/subpath")
-      ..reply(
-        200,
-        result,
-      );
+    nock('http://127.0.0.1').get('/subpath').reply(
+          200,
+          result,
+        );
 
-    final request = await client.getUrl(Uri.parse("http://127.0.0.1/subpath"));
+    final request = await client.getUrl(Uri.parse('http://127.0.0.1/subpath'));
     final response = await request.close();
     final body = await response.transform(utf8.decoder).toList();
 
@@ -81,21 +78,21 @@ void main() {
 
     {
       final request =
-          await client.getUrl(Uri.parse("http://127.0.0.1/subpath"));
+          await client.getUrl(Uri.parse('http://127.0.0.1/subpath'));
       expect(request.close(), throwsA(TypeMatcher<NetConnectionNotAllowed>()));
     }
 
     {
       final request =
-          await client.postUrl(Uri.parse("http://127.0.0.1/subpath"));
+          await client.postUrl(Uri.parse('http://127.0.0.1/subpath'));
       expect(request.close(), throwsA(TypeMatcher<NetConnectionNotAllowed>()));
     }
   });
 
-  test("cancel", () async {
-    final result = {"foo": "bar"};
+  test('cancel', () async {
+    final result = {'foo': 'bar'};
 
-    final interceptor = nock("http://127.0.0.1").get("/subpath")
+    final interceptor = nock('http://127.0.0.1').get('/subpath')
       ..reply(
         200,
         result,
@@ -103,7 +100,7 @@ void main() {
 
     interceptor.cancel();
 
-    final request = await client.getUrl(Uri.parse("http://127.0.0.1/subpath"));
+    final request = await client.getUrl(Uri.parse('http://127.0.0.1/subpath'));
 
     expect(
       request.close(),
@@ -111,22 +108,22 @@ void main() {
     );
   });
 
-  test("on complete", () async {
-    final result = {"foo": "bar"};
+  test('on complete', () async {
+    final result = {'foo': 'bar'};
 
-    final interceptor = nock("http://127.0.0.1").get("/subpath")
+    final interceptor = nock('http://127.0.0.1').get('/subpath')
       ..reply(
         200,
         result,
       );
 
-    bool isCompleted = false;
+    var isCompleted = false;
 
     interceptor.onReply(() {
       isCompleted = true;
     });
 
-    final request = await client.getUrl(Uri.parse("http://127.0.0.1/subpath"));
+    final request = await client.getUrl(Uri.parse('http://127.0.0.1/subpath'));
 
     expect(isCompleted, false);
     await request.close();
@@ -134,9 +131,9 @@ void main() {
   });
 
   test("persist", () async {
-    final result = {"foo": "bar"};
+    final result = {'foo': 'bar'};
 
-    final scope = nock("http://127.0.0.1").get("/subpath")
+    final scope = nock('http://127.0.0.1').get('/subpath')
       ..persist()
       ..reply(
         200,
@@ -145,7 +142,7 @@ void main() {
 
     {
       final request =
-          await client.getUrl(Uri.parse("http://127.0.0.1/subpath"));
+          await client.getUrl(Uri.parse('http://127.0.0.1/subpath'));
       final response = await request.close();
       final body = await response.transform(utf8.decoder).toList();
 
@@ -157,7 +154,7 @@ void main() {
 
     {
       final request =
-          await client.getUrl(Uri.parse("http://127.0.0.1/subpath"));
+          await client.getUrl(Uri.parse('http://127.0.0.1/subpath'));
       final response = await request.close();
       final body = await response.transform(utf8.decoder).toList();
 
@@ -167,20 +164,20 @@ void main() {
 
     {
       final request =
-          await client.getUrl(Uri.parse("http://127.0.0.1/subpath"));
+          await client.getUrl(Uri.parse('http://127.0.0.1/subpath'));
       expect(request.close(), throwsA(TypeMatcher<NetConnectionNotAllowed>()));
     }
   });
 
-  test("query", () async {
-    nock("http://127.0.0.1").get("/subpath")
-      ..query({"a": "1"})
+  test('query', () async {
+    nock('http://127.0.0.1').get('/subpath')
+      ..query({'a': '1'})
       ..reply(
         200,
-        "something",
+        'something',
       );
 
-    final uri = Uri.parse("http://127.0.0.1/subpath");
+    final uri = Uri.parse('http://127.0.0.1/subpath');
 
     {
       final req = await client.getUrl(uri);
@@ -192,56 +189,55 @@ void main() {
     }
 
     {
-      final uri = Uri.parse("http://127.0.0.1/subpath?a=1");
+      final uri = Uri.parse('http://127.0.0.1/subpath?a=1');
       final req = await client.getUrl(uri);
       final response = await req.close();
       final body = await response.transform(utf8.decoder).toList();
 
-      expect(body.join(), "something");
+      expect(body.join(), 'something');
     }
   });
 
-  test("post match", () async {
-    nock("http://127.0.0.1").post("/subpath", anything)
+  test('post match', () async {
+    nock('http://127.0.0.1').post('/subpath', anything)
       ..persist()
       ..reply(
         200,
-        "something",
+        'something',
       );
 
-    final uri = Uri.parse("http://127.0.0.1/subpath");
+    final uri = Uri.parse('http://127.0.0.1/subpath');
 
     {
       final req = await client.postUrl(uri);
       final response = await req.close();
       final body = await response.transform(utf8.decoder).toList();
-      expect(body.join(), "something");
+      expect(body.join(), 'something');
     }
 
     {
-      final uri = Uri.parse("http://127.0.0.1/subpath");
+      final uri = Uri.parse('http://127.0.0.1/subpath');
       final req = await client.postUrl(uri);
 
       req.headers.contentType = ContentType.json;
-      req.write(json.encode({"spongebob": "square pants"}));
+      req.write(json.encode({'spongebob': 'square pants'}));
 
       final response = await req.close();
       final body = await response.transform(utf8.decoder).toList();
 
-      expect(body.join(), "something");
+      expect(body.join(), 'something');
     }
   });
 
-  test("body match", () async {
+  test('body match', () async {
     final data = {'data': 1234};
 
-    nock("http://127.0.0.1").post("/subpath", data)
-      ..reply(
-        200,
-        "something",
-      );
+    nock('http://127.0.0.1').post('/subpath', data).reply(
+          200,
+          'something',
+        );
 
-    final uri = Uri.parse("http://127.0.0.1/subpath");
+    final uri = Uri.parse('http://127.0.0.1/subpath');
 
     {
       final req = await client.postUrl(uri);
@@ -253,7 +249,7 @@ void main() {
     }
 
     {
-      final uri = Uri.parse("http://127.0.0.1/subpath");
+      final uri = Uri.parse('http://127.0.0.1/subpath');
       final req = await client.postUrl(uri);
 
       req.headers.contentType = ContentType.json;
@@ -262,23 +258,23 @@ void main() {
       final response = await req.close();
       final body = await response.transform(utf8.decoder).toList();
 
-      expect(body.join(), "something");
+      expect(body.join(), 'something');
     }
   });
 
-  test("request headers", () async {
-    nock("http://127.0.0.1").get("/subpath")
-      ..headers({"foo": "bar"})
+  test('request headers', () async {
+    nock('http://127.0.0.1').get('/subpath')
+      ..headers({'foo': 'bar'})
       ..reply(
         200,
-        "baz",
+        'baz',
       );
 
-    final uri = Uri.parse("http://127.0.0.1/subpath");
+    final uri = Uri.parse('http://127.0.0.1/subpath');
 
     {
       final req = await client.getUrl(uri);
-      req.headers.add("foo", "bax");
+      req.headers.add('foo', 'bax');
 
       expect(
         req.close(),
@@ -288,7 +284,7 @@ void main() {
 
     {
       final req = await client.getUrl(uri);
-      req.headers.add("foo", "bar");
+      req.headers.add('foo', 'bar');
       final response = await req.close();
       final body = await response.transform(utf8.decoder).toList();
 
@@ -296,29 +292,28 @@ void main() {
     }
   });
 
-  test("reply headers", () async {
-    nock("http://127.0.0.1").get("/subpath")
-      ..reply(
-        200,
-        "foobar",
-        headers: {'foo': 'bar'},
-      );
+  test('reply headers', () async {
+    nock('http://127.0.0.1').get('/subpath').reply(
+      200,
+      'foobar',
+      headers: {'foo': 'bar'},
+    );
 
-    final uri = Uri.parse("http://127.0.0.1/subpath");
+    final uri = Uri.parse('http://127.0.0.1/subpath');
     final req = await client.getUrl(uri);
     final response = await req.close();
     final body = await response.transform(utf8.decoder).toList();
 
-    expect(body.join(), "foobar");
-    expect(response.headers.value("foo"), "bar");
+    expect(body.join(), 'foobar');
+    expect(response.headers.value('foo'), 'bar');
   });
 
-  test("exception", () async {
-    nock("http://127.0.0.1").get("/subpath")..throwing(() => "my exception");
+  test('exception', () async {
+    nock('http://127.0.0.1').get("/subpath").throwing(() => 'my exception');
 
-    final uri = Uri.parse("http://127.0.0.1/subpath");
+    final uri = Uri.parse('http://127.0.0.1/subpath');
     final req = await client.getUrl(uri);
 
-    expect(req.close(), throwsA("my exception"));
+    expect(req.close(), throwsA('my exception'));
   });
 }

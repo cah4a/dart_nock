@@ -13,15 +13,15 @@ class NockScope {
         ),
       );
 
-  Interceptor get(path) => _when("get", path, null);
+  Interceptor get(path) => _when('get', path, null);
 
-  Interceptor post(path, [data]) => _when("post", path, data);
+  Interceptor post(path, [data]) => _when('post', path, data);
 
-  Interceptor put(path, [data]) => _when("put", path, data);
+  Interceptor put(path, [data]) => _when('put', path, data);
 
-  Interceptor delete(path, [data]) => _when("delete", path, data);
+  Interceptor delete(path, [data]) => _when('delete', path, data);
 
-  Interceptor patch(path, [data]) => _when("patch", path, data);
+  Interceptor patch(path, [data]) => _when('patch', path, data);
 
-  Interceptor head(path, [data]) => _when("head", path, data);
+  Interceptor head(path, [data]) => _when('head', path, data);
 }

@@ -12,17 +12,22 @@ class NockOverrides extends HttpOverrides {
   }
 
   @override
-  HttpClient createHttpClient(SecurityContext context) {
+  HttpClient createHttpClient(SecurityContext? context) {
     return MockClient();
   }
 }
 
 class MockClient implements HttpClient {
-  bool autoUncompress;
-  Duration connectionTimeout;
-  Duration idleTimeout;
-  int maxConnectionsPerHost;
-  String userAgent;
+  @override
+  late bool autoUncompress;
+  @override
+  Duration? connectionTimeout;
+  @override
+  late Duration idleTimeout;
+  @override
+  int? maxConnectionsPerHost;
+  @override
+  String? userAgent;
 
   @override
   @override
@@ -37,11 +42,11 @@ class MockClient implements HttpClient {
   @override
   Future<HttpClientRequest> open(
       String method, String host, int port, String path) {
-    const int hashMark = 0x23;
-    const int questionMark = 0x3f;
-    int fragmentStart = path.length;
-    int queryStart = path.length;
-    for (int i = path.length - 1; i >= 0; i--) {
+    const hashMark = 0x23;
+    const questionMark = 0x3f;
+    var fragmentStart = path.length;
+    var queryStart = path.length;
+    for (var i = path.length - 1; i >= 0; i--) {
       var char = path.codeUnitAt(i);
       if (char == hashMark) {
         fragmentStart = i;
@@ -50,45 +55,62 @@ class MockClient implements HttpClient {
         queryStart = i;
       }
     }
-    String query;
+    String? query;
     if (queryStart < fragmentStart) {
       query = path.substring(queryStart + 1, fragmentStart);
       path = path.substring(0, queryStart);
     }
-    Uri uri =
-        Uri(scheme: "http", host: host, port: port, path: path, query: query);
+    final uri = Uri(
+      scheme: 'http',
+      host: host,
+      port: port,
+      path: path,
+      query: query,
+    );
     return openUrl(method, uri);
   }
 
+  @override
   Future<HttpClientRequest> get(String host, int port, String path) =>
-      open("get", host, port, path);
+      open('get', host, port, path);
 
-  Future<HttpClientRequest> getUrl(Uri url) => openUrl("get", url);
+  @override
+  Future<HttpClientRequest> getUrl(Uri url) => openUrl('get', url);
 
+  @override
   Future<HttpClientRequest> post(String host, int port, String path) =>
-      open("post", host, port, path);
+      open('post', host, port, path);
 
-  Future<HttpClientRequest> postUrl(Uri url) => openUrl("post", url);
+  @override
+  Future<HttpClientRequest> postUrl(Uri url) => openUrl('post', url);
 
+  @override
   Future<HttpClientRequest> put(String host, int port, String path) =>
-      open("put", host, port, path);
+      open('put', host, port, path);
 
-  Future<HttpClientRequest> putUrl(Uri url) => openUrl("put", url);
+  @override
+  Future<HttpClientRequest> putUrl(Uri url) => openUrl('put', url);
 
+  @override
   Future<HttpClientRequest> delete(String host, int port, String path) =>
-      open("delete", host, port, path);
+      open('delete', host, port, path);
 
-  Future<HttpClientRequest> deleteUrl(Uri url) => openUrl("delete", url);
+  @override
+  Future<HttpClientRequest> deleteUrl(Uri url) => openUrl('delete', url);
 
+  @override
   Future<HttpClientRequest> head(String host, int port, String path) =>
-      open("head", host, port, path);
+      open('head', host, port, path);
 
-  Future<HttpClientRequest> headUrl(Uri url) => openUrl("head", url);
+  @override
+  Future<HttpClientRequest> headUrl(Uri url) => openUrl('head', url);
 
+  @override
   Future<HttpClientRequest> patch(String host, int port, String path) =>
-      open("patch", host, port, path);
+      open('patch', host, port, path);
 
-  Future<HttpClientRequest> patchUrl(Uri url) => openUrl("patch", url);
+  @override
+  Future<HttpClientRequest> patchUrl(Uri url) => openUrl('patch', url);
 
   @override
   void addCredentials(
@@ -104,20 +126,20 @@ class MockClient implements HttpClient {
 
   @override
   set authenticate(
-      Future<bool> Function(Uri url, String scheme, String realm) f) {
+      Future<bool> Function(Uri url, String scheme, String realm)? f) {
     // TODO: implement authenticate
   }
 
   @override
   set authenticateProxy(
-      Future<bool> Function(String host, int port, String scheme, String realm)
+      Future<bool> Function(String host, int port, String scheme, String realm)?
           f) {
     // TODO: implement authenticateProxy
   }
 
   @override
   set badCertificateCallback(
-      bool Function(X509Certificate cert, String host, int port) callback) {
+      bool Function(X509Certificate cert, String host, int port)? callback) {
     // TODO: implement badCertificateCallback
   }
 
@@ -125,16 +147,23 @@ class MockClient implements HttpClient {
   void close({bool force = false}) => null;
 
   @override
-  set findProxy(String Function(Uri url) f) => null;
+  set findProxy(String Function(Uri url)? f) => null;
 }
 
 class MockHttpClientRequest extends HttpClientRequest {
+  @override
   final String method;
-  final Uri uri;
-  final HttpHeaders headers;
-  final body = <int>[];
 
-  Encoding encoding;
+  @override
+  final Uri uri;
+
+  @override
+  final HttpHeaders headers;
+
+  @override
+  late Encoding encoding;
+  
+  final body = <int>[];
 
   MockHttpClientRequest(this.method, this.uri, this.headers);
 
@@ -149,7 +178,7 @@ class MockHttpClientRequest extends HttpClientRequest {
     registry.completed(interceptor);
 
     if (interceptor.exception != null) {
-      throw interceptor.exception();
+      throw interceptor.exception!();
     }
 
     final headers = MockHttpHeaders('1.1');
@@ -168,13 +197,13 @@ class MockHttpClientRequest extends HttpClientRequest {
   }
 
   @override
-  void addError(Object error, [StackTrace stackTrace]) {
+  void addError(Object error, [StackTrace? stackTrace]) {
     // what should we do with that?
   }
 
   @override
-  void abort([Object exception, StackTrace stackTrace]) {
-      // what should we do with that?
+  void abort([Object? exception, StackTrace? stackTrace]) {
+    // what should we do with that?
   }
 
   @override
@@ -186,24 +215,23 @@ class MockHttpClientRequest extends HttpClientRequest {
   Future<HttpClientResponse> close() => done;
 
   @override
-  HttpConnectionInfo get connectionInfo => null;
+  HttpConnectionInfo? get connectionInfo => null;
 
   @override
   List<Cookie> get cookies => [];
 
   @override
-  Future flush() {
+  Future<void> flush() async {
     // nuftodo
-    return null;
   }
 
   @override
-  void write(Object obj) {
+  void write(Object? obj) {
     add(obj.toString().codeUnits);
   }
 
   @override
-  void writeAll(Iterable objects, [String separator = ""]) {
+  void writeAll(Iterable objects, [String separator = '']) {
     objects.forEach(write);
   }
 
@@ -213,15 +241,19 @@ class MockHttpClientRequest extends HttpClientRequest {
   }
 
   @override
-  void writeln([Object obj = ""]) {
-    write(obj.toString() + "\n");
+  void writeln([Object? obj = '']) {
+    write(obj.toString() + '\n');
   }
 }
 
 class MockHttpClientResponse extends Stream<List<int>>
     implements HttpClientResponse {
+  @override
   final HttpHeaders headers;
+
+  @override
   final int statusCode;
+  
   final List<int> content;
 
   MockHttpClientResponse(
@@ -233,12 +265,10 @@ class MockHttpClientResponse extends Stream<List<int>>
   }
 
   @override
-  // TODO: implement certificate
-  X509Certificate get certificate => null;
+  X509Certificate? get certificate => null;
 
   @override
-  // TODO: implement connectionInfo
-  HttpConnectionInfo get connectionInfo => null;
+  HttpConnectionInfo? get connectionInfo => null;
 
   @override
   int get contentLength => content.length;
@@ -247,14 +277,20 @@ class MockHttpClientResponse extends Stream<List<int>>
   List<Cookie> get cookies => [];
 
   @override
-  Future<Socket> detachSocket() async => null;
+  Future<Socket> detachSocket() {
+    throw Exception('Detach socket is not supported');
+  }
 
   @override
   bool get isRedirect => false;
 
   @override
-  StreamSubscription<List<int>> listen(void Function(List<int> event) onData,
-      {Function onError, void Function() onDone, bool cancelOnError}) {
+  StreamSubscription<List<int>> listen(
+    void Function(List<int> event)? onData, {
+    Function? onError,
+    void Function()? onDone,
+    bool? cancelOnError,
+  }) {
     return Stream.fromIterable([content]).listen(
       onData,
       onError: onError,
@@ -271,95 +307,95 @@ class MockHttpClientResponse extends Stream<List<int>>
     // fucking copy-paste from dart sources
     switch (statusCode) {
       case HttpStatus.continue_:
-        return "Continue";
+        return 'Continue';
       case HttpStatus.switchingProtocols:
-        return "Switching Protocols";
+        return 'Switching Protocols';
       case HttpStatus.ok:
-        return "OK";
+        return 'OK';
       case HttpStatus.created:
-        return "Created";
+        return 'Created';
       case HttpStatus.accepted:
-        return "Accepted";
+        return 'Accepted';
       case HttpStatus.nonAuthoritativeInformation:
-        return "Non-Authoritative Information";
+        return 'Non-Authoritative Information';
       case HttpStatus.noContent:
-        return "No Content";
+        return 'No Content';
       case HttpStatus.resetContent:
-        return "Reset Content";
+        return 'Reset Content';
       case HttpStatus.partialContent:
-        return "Partial Content";
+        return 'Partial Content';
       case HttpStatus.multipleChoices:
-        return "Multiple Choices";
+        return 'Multiple Choices';
       case HttpStatus.movedPermanently:
-        return "Moved Permanently";
+        return 'Moved Permanently';
       case HttpStatus.found:
-        return "Found";
+        return 'Found';
       case HttpStatus.seeOther:
-        return "See Other";
+        return 'See Other';
       case HttpStatus.notModified:
-        return "Not Modified";
+        return 'Not Modified';
       case HttpStatus.useProxy:
-        return "Use Proxy";
+        return 'Use Proxy';
       case HttpStatus.temporaryRedirect:
-        return "Temporary Redirect";
+        return 'Temporary Redirect';
       case HttpStatus.badRequest:
-        return "Bad Request";
+        return 'Bad Request';
       case HttpStatus.unauthorized:
-        return "Unauthorized";
+        return 'Unauthorized';
       case HttpStatus.paymentRequired:
-        return "Payment Required";
+        return 'Payment Required';
       case HttpStatus.forbidden:
-        return "Forbidden";
+        return 'Forbidden';
       case HttpStatus.notFound:
-        return "Not Found";
+        return 'Not Found';
       case HttpStatus.methodNotAllowed:
-        return "Method Not Allowed";
+        return 'Method Not Allowed';
       case HttpStatus.notAcceptable:
-        return "Not Acceptable";
+        return 'Not Acceptable';
       case HttpStatus.proxyAuthenticationRequired:
-        return "Proxy Authentication Required";
+        return 'Proxy Authentication Required';
       case HttpStatus.requestTimeout:
-        return "Request Time-out";
+        return 'Request Time-out';
       case HttpStatus.conflict:
-        return "Conflict";
+        return 'Conflict';
       case HttpStatus.gone:
-        return "Gone";
+        return 'Gone';
       case HttpStatus.lengthRequired:
-        return "Length Required";
+        return 'Length Required';
       case HttpStatus.preconditionFailed:
-        return "Precondition Failed";
+        return 'Precondition Failed';
       case HttpStatus.requestEntityTooLarge:
-        return "Request Entity Too Large";
+        return 'Request Entity Too Large';
       case HttpStatus.requestUriTooLong:
-        return "Request-URI Too Long";
+        return 'Request-URI Too Long';
       case HttpStatus.unsupportedMediaType:
-        return "Unsupported Media Type";
+        return 'Unsupported Media Type';
       case HttpStatus.requestedRangeNotSatisfiable:
-        return "Requested range not satisfiable";
+        return 'Requested range not satisfiable';
       case HttpStatus.expectationFailed:
-        return "Expectation Failed";
+        return 'Expectation Failed';
       case HttpStatus.internalServerError:
-        return "Internal Server Error";
+        return 'Internal Server Error';
       case HttpStatus.notImplemented:
-        return "Not Implemented";
+        return 'Not Implemented';
       case HttpStatus.badGateway:
-        return "Bad Gateway";
+        return 'Bad Gateway';
       case HttpStatus.serviceUnavailable:
-        return "Service Unavailable";
+        return 'Service Unavailable';
       case HttpStatus.gatewayTimeout:
-        return "Gateway Time-out";
+        return 'Gateway Time-out';
       case HttpStatus.httpVersionNotSupported:
-        return "Http Version not supported";
+        return 'Http Version not supported';
       default:
-        return "Status $statusCode";
+        return 'Status $statusCode';
     }
   }
 
   @override
   Future<HttpClientResponse> redirect([
-    String method,
-    Uri url,
-    bool followLoops,
+    String? method,
+    Uri? url,
+    bool? followLoops,
   ]) async =>
       this;
 

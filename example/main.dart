@@ -11,17 +11,17 @@ void main() {
     nock.cleanAll();
   });
 
-  test("example", () async {
-    final interceptor = nock("http://localhost/api").get("/users")
+  test('example', () async {
+    final interceptor = nock('http://localhost/api').get('/users')
       ..reply(
         200,
-        "result",
+        'result',
       );
 
-    final response = await http.get("http://localhost/api/users");
+    final response = await http.get(Uri.parse('http://localhost/api/users'));
 
     expect(interceptor.isDone, true);
     expect(response.statusCode, 200);
-    expect(response.body, "result");
+    expect(response.body, 'result');
   });
 }

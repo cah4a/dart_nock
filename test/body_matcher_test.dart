@@ -8,13 +8,13 @@ void main() {
   group('cases', () {
     final cases = [
       _Case(
-        expected: "foobar",
-        actual: "otherstring",
+        expected: 'foobar',
+        actual: 'otherstring',
         result: false,
       ),
       _Case(
-        expected: "普通话",
-        actual: "普通话",
+        expected: '普通话',
+        actual: '普通话',
         result: true,
       ),
       _Case(
@@ -30,41 +30,41 @@ void main() {
         contentType: ContentType.json,
       ),
       _Case(
-        expected: RegExp(r"\d"),
+        expected: RegExp(r'\d'),
         actual: '1',
         result: true,
       ),
       _Case(
-        expected: RegExp(r"\d"),
+        expected: RegExp(r'\d'),
         actual: 'a',
         result: false,
       ),
       _Case(
-        expected: {"foo": anyOf(1, 2, 3)},
+        expected: {'foo': anyOf(1, 2, 3)},
         actual: '{ "foo": 1 }',
         result: true,
         contentType: ContentType.json,
       ),
       _Case(
-        expected: {"foo": "5"},
+        expected: {'foo': '5'},
         actual: 'foo=5',
         result: true,
-        contentType: ContentType.parse("application/x-www-form-urlencoded"),
+        contentType: ContentType.parse('application/x-www-form-urlencoded'),
       ),
       _Case(
-        expected: {"foo": "5"},
+        expected: {'foo': '5'},
         actual: 'foo=3',
         result: false,
-        contentType: ContentType.parse("application/x-www-form-urlencoded"),
+        contentType: ContentType.parse('application/x-www-form-urlencoded'),
       ),
       _Case(
-        expected: {"foo": anyOf("1", "2", "5")},
+        expected: {'foo': anyOf('1', '2', '5')},
         actual: 'foo=5',
         result: true,
-        contentType: ContentType.parse("application/x-www-form-urlencoded"),
+        contentType: ContentType.parse('application/x-www-form-urlencoded'),
       ),
       _Case(
-        expected: contains("foo"),
+        expected: contains('foo'),
         actual: '{"foo": 3, "bar": 4}',
         result: true,
         contentType: ContentType.json,
@@ -77,7 +77,7 @@ void main() {
     ];
 
     cases.forEach((c) {
-      test("${c.expected} -> ${c.actual}", () {
+      test('${c.expected} -> ${c.actual}', () {
         final matcher = BodyMatcher(c.expected);
         expect(matcher.match(c.body, c.contentType), c.result);
       });
@@ -88,8 +88,8 @@ void main() {
 class _Case {
   final expected;
   final actual;
-  final bool result;
-  final ContentType contentType;
+  final bool? result;
+  final ContentType? contentType;
 
   _Case({this.expected, this.actual, this.result, this.contentType});
 
