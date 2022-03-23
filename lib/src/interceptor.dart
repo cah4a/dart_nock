@@ -13,8 +13,12 @@ final registry = Registry();
 
 class Registry {
   final _interceptors = <Interceptor>[];
+  final _automaticInterceptors = <Interceptor>[];
 
-  void cleanAll() => _interceptors.clear();
+  void cleanAll() {
+    _interceptors.clear();
+    _automaticInterceptors.clear();
+  }
 
   Iterable<Interceptor> get pendingMocks => _interceptors.where(
         (interceptor) => !interceptor.isDone,
@@ -22,7 +26,17 @@ class Registry {
 
   Iterable<Interceptor> get activeMocks => _interceptors;
 
-  void add(Interceptor interceptor) => _interceptors.add(interceptor);
+  void add(Interceptor interceptor) {
+    _interceptors.add(interceptor);
+
+    if (interceptor.generateAuto){
+      if (interceptor._matcher.method.toUpperCase() == 'GET') {
+        _automaticInterceptors.add(interceptor.copyWith(
+            matcher: interceptor._matcher.copyWith(method: 'HEAD'), body: '' // empty string, because the receiver can't tell the difference between a null parameter and a non-exstent parameter
+            ));
+      }
+    }
+  }
 
   void remove(Interceptor interceptor) {
     _interceptors.remove(interceptor);
@@ -31,6 +45,12 @@ class Registry {
 
   Interceptor? match(HttpClientRequest request) {
     for (var interceptor in _interceptors) {
+      if (interceptor._matcher.match(request as MockHttpClientRequest)) {
+        return interceptor;
+      }
+    }
+
+    for (var interceptor in _automaticInterceptors) {
       if (interceptor._matcher.match(request as MockHttpClientRequest)) {
         return interceptor;
       }
@@ -53,11 +73,12 @@ class Registry {
 
 typedef ExceptionThrower = void Function();
 
-class Interceptor {
+class  Interceptor {
   final RequestMatcher _matcher;
+  final bool generateAuto;
 
   Map<String, String>? replyHeaders;
-  late int statusCode;
+  int? statusCode;
   dynamic body;
   Function? exception;
 
@@ -68,7 +89,18 @@ class Interceptor {
 
   StreamController? _onReply;
 
-  Interceptor(this._matcher);
+  Interceptor(this._matcher, {this.generateAuto = true});
+  Interceptor copyWith({RequestMatcher? matcher, dynamic body, int? statusCode}) {
+    var rv =  Interceptor(matcher ?? _matcher);
+    rv._isPersist = _isPersist;
+    rv._isDone = _isDone;
+    rv._isRegistered = _isRegistered;
+    rv._isCanceled = _isCanceled;
+    final newStatusCode = statusCode ?? this.statusCode;
+    if (newStatusCode != null) rv.reply (newStatusCode, (body == '') ? null : body ?? this.body, headers:replyHeaders);
+    return rv;
+  }
+
 
   bool get isDone => _isDone;
 
@@ -82,7 +114,8 @@ class Interceptor {
     }
 
     if (_isRegistered) {
-      throw AlreadyRegistered(this);
+      return;
+      // throw AlreadyRegistered(this); // not an error to attempt to re-register - it might happen when copying. But definitely don't register twice.
     }
 
     _isRegistered = true;
@@ -197,4 +230,5 @@ class Interceptor {
       callback();
     });
   }
+
 }

@@ -28,6 +28,45 @@ void main() {
     expect(body.join(), 'result');
   });
 
+  test('straight forward, check automatic head', () async {
+    nock('http://127.0.0.1').get('/subpath').reply(
+      200,
+      'result',
+    );
+
+    final request = await client.headUrl(Uri.parse('http://127.0.0.1/subpath'));
+    final response = await request.close();
+    final body = await response.transform(utf8.decoder).toList();
+
+    expect(response.statusCode, 200);
+    expect(body.join(), '');
+  });
+
+  test('straight forward, override automatic head', () async {
+    final n = nock('http://127.0.0.1');
+    n.get('/subpath').reply(200, 'result',);
+    n.head('/subpath').reply(200, 'overridden',);
+
+    final request = await client.headUrl(Uri.parse('http://127.0.0.1/subpath'));
+    final response = await request.close();
+    final body = await response.transform(utf8.decoder).toList();
+
+    expect(response.statusCode, 200);
+    expect(body.join(), 'overridden');
+  });
+
+  test('straight forward, suppress automatic head', () async {
+    nock('http://127.0.0.1').get('/subpath', autoHead: false).reply(
+      200,
+      'result',
+    );
+
+    {
+      final request = await client.headUrl(Uri.parse('http://127.0.0.1/subpath'));
+      expect(request.close(), throwsA(TypeMatcher<NetConnectionNotAllowed>()));
+    }
+  });
+
   test('using matchers for urls', () async {
     nock('http://127.0.0.1').get(startsWith('/subpath?ref=')).reply(
           200,
