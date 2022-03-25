@@ -13,12 +13,8 @@ final registry = Registry();
 
 class Registry {
   final _interceptors = <Interceptor>[];
-  final _automaticInterceptors = <Interceptor>[];
 
-  void cleanAll() {
-    _interceptors.clear();
-    _automaticInterceptors.clear();
-  }
+  void cleanAll() => _interceptors.clear();
 
   Iterable<Interceptor> get pendingMocks => _interceptors.where(
         (interceptor) => !interceptor.isDone,
@@ -26,22 +22,13 @@ class Registry {
 
   Iterable<Interceptor> get activeMocks => _interceptors;
 
-  void add(Interceptor interceptor) {
-    _interceptors.add(interceptor);
-
-    if (interceptor.generateAuto){
-      if (interceptor._matcher.method.toUpperCase() == 'GET') {
-        _automaticInterceptors.add(interceptor.copyWith(
-            matcher: interceptor._matcher.copyWith(method: 'HEAD'), body: '' // empty string, because the receiver can't tell the difference between a null parameter and a non-exstent parameter
-            ));
-      }
-    }
-  }
+  void add(Interceptor interceptor) => _interceptors.add(interceptor);
 
   void remove(Interceptor interceptor) {
     _interceptors.remove(interceptor);
     interceptor._onReply?.close();
   }
+
 
   Interceptor? match(HttpClientRequest request) {
     for (var interceptor in _interceptors) {
@@ -50,9 +37,9 @@ class Registry {
       }
     }
 
-    for (var interceptor in _automaticInterceptors) {
-      if (interceptor._matcher.match(request as MockHttpClientRequest)) {
-        return interceptor;
+    for (var autoInterceptor in _interceptors.map ((i)=> i.autoOption).where ((i)=> i!= null) ) {
+      if (autoInterceptor!._matcher.match(request as MockHttpClientRequest)) {
+        return autoInterceptor;
       }
     }
 
@@ -90,6 +77,18 @@ class  Interceptor {
   StreamController? _onReply;
 
   Interceptor(this._matcher, {this.generateAuto = true});
+
+  Interceptor? get autoOption {
+    if (!generateAuto) return null;
+    switch (_matcher.method.toUpperCase()) {
+      case 'GET' : return copyWith(
+          matcher: _matcher.copyWith(method: 'HEAD'),
+          body: '' // empty string, because the receiver can't tell the difference between a null parameter and a non-existent parameter
+      );
+      default: return null;
+    }
+  }
+
   Interceptor copyWith({RequestMatcher? matcher, dynamic body, int? statusCode}) {
     var rv =  Interceptor(matcher ?? _matcher);
     rv._isPersist = _isPersist;
@@ -97,7 +96,7 @@ class  Interceptor {
     rv._isRegistered = _isRegistered;
     rv._isCanceled = _isCanceled;
     final newStatusCode = statusCode ?? this.statusCode;
-    if (newStatusCode != null) rv.reply (newStatusCode, (body == '') ? null : body ?? this.body, headers:replyHeaders);
+    if (newStatusCode != null) rv.reply (newStatusCode, (body == '') ? null : body ?? this.body, headers:replyHeaders); // Empty string means null response
     return rv;
   }
 
