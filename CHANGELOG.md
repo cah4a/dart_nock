@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.3
+
+- Dart 2.17 support
+
 ## 1.1.2
 
 - Add ability to pass url matcher with query parameters inside

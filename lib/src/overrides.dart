@@ -128,7 +128,8 @@ class MockClient implements HttpClient {
   Function(Uri url, String scheme, String realm)? authenticate;
 
   @override
-  Function(String host, int port, String scheme, String realm)? authenticateProxy;
+  Function(String host, int port, String scheme, String realm)?
+      authenticateProxy;
 
   @override
   Function(X509Certificate cert, String host, int port)? badCertificateCallback;
@@ -138,10 +139,10 @@ class MockClient implements HttpClient {
 
   @override
   Function(Uri url)? findProxy;
-  
+
   @override
   Function(Uri url, String? proxyHost, int? proxyPort)? connectionFactory;
-  
+
   @override
   Function(String line)? keyLog;
 }
@@ -158,7 +159,7 @@ class MockHttpClientRequest extends HttpClientRequest {
 
   @override
   late Encoding encoding;
-  
+
   final body = <int>[];
 
   MockHttpClientRequest(this.method, this.uri, this.headers);
@@ -249,7 +250,7 @@ class MockHttpClientResponse extends Stream<List<int>>
 
   @override
   final int statusCode;
-  
+
   final List<int> content;
 
   MockHttpClientResponse(

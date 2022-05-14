@@ -512,14 +512,19 @@ class MockHttpHeaders implements HttpHeaders {
   String toString() {
     final sb = StringBuffer();
     _headers.forEach((String name, List<String?> values) {
-      sb..write(name)..write(': ');
+      sb
+        ..write(name)
+        ..write(': ');
       final fold = _foldHeader(name);
       for (var i = 0; i < values.length; i++) {
         if (i > 0) {
           if (fold) {
             sb.write(', ');
           } else {
-            sb..write('\n')..write(name)..write(': ');
+            sb
+              ..write('\n')
+              ..write(name)
+              ..write(': ');
           }
         }
         sb.write(values[i]);
@@ -679,7 +684,11 @@ class _HeaderValue implements HeaderValue {
     sb.write(_value);
     if (parameters.isNotEmpty) {
       _parameters!.forEach((String name, String? value) {
-        sb..write('; ')..write(name)..write('=')..write(value);
+        sb
+          ..write('; ')
+          ..write(name)
+          ..write('=')
+          ..write(value);
       });
     }
     return sb.toString();
@@ -1123,18 +1132,29 @@ class _Cookie implements Cookie {
 
   String toString() {
     final sb = StringBuffer();
-    sb..write(name)..write('=')..write(value);
+    sb
+      ..write(name)
+      ..write('=')
+      ..write(value);
     if (expires != null) {
-      sb..write('; Expires=')..write(HttpDate.format(expires!));
+      sb
+        ..write('; Expires=')
+        ..write(HttpDate.format(expires!));
     }
     if (maxAge != null) {
-      sb..write('; Max-Age=')..write(maxAge);
+      sb
+        ..write('; Max-Age=')
+        ..write(maxAge);
     }
     if (domain != null) {
-      sb..write('; Domain=')..write(domain);
+      sb
+        ..write('; Domain=')
+        ..write(domain);
     }
     if (path != null) {
-      sb..write('; Path=')..write(path);
+      sb
+        ..write('; Path=')
+        ..write(path);
     }
     if (secure) sb.write('; Secure');
     if (httpOnly) sb.write('; HttpOnly');
