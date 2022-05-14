@@ -125,29 +125,25 @@ class MockClient implements HttpClient {
   }
 
   @override
-  set authenticate(
-      Future<bool> Function(Uri url, String scheme, String realm)? f) {
-    // TODO: implement authenticate
-  }
+  Function(Uri url, String scheme, String realm)? authenticate;
 
   @override
-  set authenticateProxy(
-      Future<bool> Function(String host, int port, String scheme, String realm)?
-          f) {
-    // TODO: implement authenticateProxy
-  }
+  Function(String host, int port, String scheme, String realm)? authenticateProxy;
 
   @override
-  set badCertificateCallback(
-      bool Function(X509Certificate cert, String host, int port)? callback) {
-    // TODO: implement badCertificateCallback
-  }
+  Function(X509Certificate cert, String host, int port)? badCertificateCallback;
 
   @override
   void close({bool force = false}) => null;
 
   @override
-  set findProxy(String Function(Uri url)? f) => null;
+  Function(Uri url)? findProxy;
+  
+  @override
+  Function(Uri url, String? proxyHost, int? proxyPort)? connectionFactory;
+  
+  @override
+  Function(String line)? keyLog;
 }
 
 class MockHttpClientRequest extends HttpClientRequest {
