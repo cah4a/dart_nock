@@ -16,9 +16,9 @@ void main() {
 
   test('straight forward', () async {
     nock('http://127.0.0.1').get('/subpath').reply(
-          200,
-          'result',
-        );
+      200,
+      'result',
+    );
 
     final request = await client.getUrl(Uri.parse('http://127.0.0.1/subpath'));
     final response = await request.close();
@@ -26,6 +26,74 @@ void main() {
 
     expect(response.statusCode, 200);
     expect(body.join(), 'result');
+  });
+
+  test('straight forward, twice', () async {
+    nock('http://127.0.0.1').get('/subpath')..persist ()..reply(
+      200,
+      'result',
+    );
+
+    final request = await client.getUrl(Uri.parse('http://127.0.0.1/subpath'));
+    final response = await request.close();
+    final body = await response.transform(utf8.decoder).toList();
+
+    expect(response.statusCode, 200);
+    expect(body.join(), 'result');
+
+    final request1 = await client.getUrl(Uri.parse('http://127.0.0.1/subpath'));
+    final response1= await request1.close();
+    final body1 = await response1.transform(utf8.decoder).toList();
+
+    expect(response1.statusCode, 200);
+    expect(body1.join(), 'result');
+  });
+
+  test('straight forward, check automatic head', () async {
+    nock('http://127.0.0.1').get('/subpath').reply(
+      200,
+      'result',
+    );
+
+    final hRequest = await client.headUrl(Uri.parse('http://127.0.0.1/subpath'));
+    final hResponse = await hRequest.close();
+    final hBody = await hResponse.transform(utf8.decoder).toList();
+
+    expect(hResponse.statusCode, 200);
+    expect(hBody.join(), '');
+
+    // make sure the get is still there
+    final gRequest = await client.getUrl(Uri.parse('http://127.0.0.1/subpath'));
+    final gResponse = await gRequest.close();
+    final gBody = await gResponse.transform(utf8.decoder).toList();
+
+    expect(gResponse.statusCode, 200);
+    expect(gBody.join(), 'result');
+  });
+
+  test('straight forward, override automatic head', () async {
+    final n = nock('http://127.0.0.1');
+    n.get('/subpath').reply(200, 'result',);
+    n.head('/subpath').reply(200, 'overridden',);
+
+    final request = await client.headUrl(Uri.parse('http://127.0.0.1/subpath'));
+    final response = await request.close();
+    final body = await response.transform(utf8.decoder).toList();
+
+    expect(response.statusCode, 200);
+    expect(body.join(), 'overridden');
+  });
+
+  test('straight forward, suppress automatic head', () async {
+    nock('http://127.0.0.1').get('/subpath', autoHead: false).reply(
+      200,
+      'result',
+    );
+
+    {
+      final request = await client.headUrl(Uri.parse('http://127.0.0.1/subpath'));
+      expect(request.close(), throwsA(TypeMatcher<NetConnectionNotAllowed>()));
+    }
   });
 
   test('using matchers for urls', () async {

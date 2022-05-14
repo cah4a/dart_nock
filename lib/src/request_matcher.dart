@@ -13,6 +13,10 @@ class RequestMatcher {
 
   RequestMatcher(this.method, this.uri, this.body);
 
+  RequestMatcher copyWith({String? method, UriMatcher? uri, BodyMatcher? body}) {
+    return RequestMatcher (method ?? this.method, uri ?? this.uri, body ?? this.body);
+  }
+
   bool match(MockHttpClientRequest request) {
     return method.toUpperCase() == request.method.toUpperCase() &&
         uri.match(request.uri)! &&

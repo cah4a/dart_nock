@@ -177,12 +177,16 @@ class MockHttpClientRequest extends HttpClientRequest {
       throw interceptor.exception!();
     }
 
+    if (interceptor.statusCode == null) { // Implies we haven't defined a reply yet.
+      throw NetConnectionNotAllowed(this, registry.pendingMocks);
+    }
+
     final headers = MockHttpHeaders('1.1');
     interceptor.replyHeaders?.forEach((key, value) => headers.add(key, value));
 
     return MockHttpClientResponse(
       headers,
-      interceptor.statusCode,
+      interceptor.statusCode!,
       interceptor.content,
     );
   }

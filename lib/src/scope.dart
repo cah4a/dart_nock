@@ -5,15 +5,16 @@ class NockScope {
 
   NockScope(this._baseUrl);
 
-  Interceptor _when(String method, dynamic path, dynamic data) => Interceptor(
+  Interceptor _when(String method, dynamic path, dynamic data, {bool generateAuto = true}) => Interceptor(
         RequestMatcher(
           method,
           UriMatcher(_baseUrl, path),
           BodyMatcher(data),
         ),
+      generateAuto: generateAuto,
       );
 
-  Interceptor get(path) => _when('get', path, null);
+  Interceptor get(path, {bool autoHead = true}) => _when('get', path, null, generateAuto: autoHead);
 
   Interceptor post(path, [data]) => _when('post', path, data);
 

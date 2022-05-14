@@ -12,7 +12,7 @@ Add dev dependency to your `pubspec.yaml`:
 
 ```yaml
 dev_dependencies:
-  nock: ^1.1.2
+  nock: ^1.1.3
 ```
 
 ## Basic usage example:
@@ -253,6 +253,32 @@ Other binary data:
 ```dart
 final interceptor = nock.get("/video")
   ..reply(200, <int>[73, 32, 97, 109, 32, 118, 105, 100, 101, 111]);
+```
+
+### Specifying `head` method responses
+
+Under normal circumstances, a `get` interceptor will imply a corresponding `head` response:
+
+For example:
+```dart
+final interceptor = nock.get("/ping")
+  ..reply(200, "pong");
+```
+responds to both `get` and `head`.  
+
+You can suppress the standard head response as follows:
+```dart
+final interceptor = nock.get("/ping")
+  ..reply(200, "pong", autoHead: false);
+```
+which responds normally to `get` requests, but responds to `head` requests by throwing `NetConnectionNotAllowed`.
+
+You can also override the standard head response just by declaring it:
+```dart
+final getInterceptor = nock.get("/ping")
+  ..reply(200, "pong");
+final headInterceptor = nock.head("/ping")
+  ..reply(400, "invalid head request");
 ```
 
 ### Specifying reply headers

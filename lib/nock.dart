@@ -52,7 +52,7 @@ class _Nock implements Nock {
   }
 
   @override
-  Interceptor get(path) => _defaultScope.get(path);
+  Interceptor get(path, {bool autoHead = true}) => _defaultScope.get(path, autoHead: autoHead);
 
   @override
   Interceptor post(path, [data]) => _defaultScope.post(path, data);
