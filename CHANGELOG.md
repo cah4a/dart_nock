@@ -1,8 +1,12 @@
 # Changelog
 
-## 1.1.3
+## 1.2.1
 
 - Dart 2.17 support
+
+## 1.2.0
+
+- Null safety support
 
 ## 1.1.2
 
