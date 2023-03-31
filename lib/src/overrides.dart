@@ -172,6 +172,10 @@ class MockHttpClientRequest extends HttpClientRequest {
       throw NetConnectionNotAllowed(this, registry.pendingMocks);
     }
 
+    if (interceptor.responseDelay != Duration.zero) {
+      await Future.delayed(interceptor.responseDelay);
+    }
+
     registry.completed(interceptor);
 
     if (interceptor.exception != null) {
