@@ -57,6 +57,9 @@ class Interceptor {
   final RequestMatcher _matcher;
 
   Map<String, String>? replyHeaders;
+
+  /// Simulates delay before response is produced. Useful for testing timeouts.
+  Duration responseDelay;
   late int statusCode;
   dynamic body;
   Function? exception;
@@ -68,7 +71,7 @@ class Interceptor {
 
   StreamController? _onReply;
 
-  Interceptor(this._matcher);
+  Interceptor(this._matcher) : responseDelay = Duration.zero;
 
   bool get isDone => _isDone;
 
@@ -124,10 +127,14 @@ class Interceptor {
     reply(statusCode, body, headers: headers);
   }
 
-  void reply(int statusCode, dynamic body, {Map<String, String>? headers}) {
+  void reply(int statusCode, dynamic body,
+      {Map<String, String>? headers,
+      Duration responseDelay = Duration.zero}) async {
     this.statusCode = statusCode;
     this.body = body;
     replyHeaders = headers;
+    this.responseDelay = responseDelay;
+
     _register();
   }
 
