@@ -130,7 +130,7 @@ void main() {
     expect(isCompleted, true);
   });
 
-  test("persist", () async {
+  test('persist', () async {
     final result = {'foo': 'bar'};
 
     final scope = nock('http://127.0.0.1').get('/subpath')
@@ -288,7 +288,7 @@ void main() {
       final response = await req.close();
       final body = await response.transform(utf8.decoder).toList();
 
-      expect(body.join(), "baz");
+      expect(body.join(), 'baz');
     }
   });
 
@@ -309,7 +309,7 @@ void main() {
   });
 
   test('exception', () async {
-    nock('http://127.0.0.1').get("/subpath").throwing(() => 'my exception');
+    nock('http://127.0.0.1').get('/subpath').throwing(() => 'my exception');
 
     final uri = Uri.parse('http://127.0.0.1/subpath');
     final req = await client.getUrl(uri);
