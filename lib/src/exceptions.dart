@@ -8,17 +8,17 @@ class NetConnectionNotAllowed extends Error {
 
   @override
   String toString() {
-    return "Request was: $_request\n$_pending";
+    return 'Request was: $_request\n$_pending';
   }
 
-  String get _request => "${request.method} ${request.uri}";
+  String get _request => '${request.method} ${request.uri}';
 
   String get _pending {
     if (pendingMocks.isEmpty) {
-      return "No pending mocks";
+      return 'No pending mocks';
     }
 
-    return "Pending mocks: " + pendingMocks.toString();
+    return 'Pending mocks: ' + pendingMocks.toString();
   }
 }
 
@@ -28,7 +28,7 @@ class UnknownUrlMatcherType implements Exception {
   UnknownUrlMatcherType(this.url);
 
   @override
-  String toString() => "Unknown url matcher type ${url.runtimeType}";
+  String toString() => 'Unknown url matcher type ${url.runtimeType}';
 }
 
 class AlreadyRegistered implements Exception {
@@ -37,7 +37,7 @@ class AlreadyRegistered implements Exception {
   AlreadyRegistered(this.interceptor);
 
   @override
-  String toString() => "Request ${interceptor} already registered";
+  String toString() => 'Request $interceptor already registered';
 }
 
 class AlreadyCanceled implements Exception {
@@ -46,7 +46,7 @@ class AlreadyCanceled implements Exception {
   AlreadyCanceled(this.interceptor);
 
   @override
-  String toString() => "Request ${interceptor} was canceled";
+  String toString() => 'Request $interceptor was canceled';
 }
 
 class MockIsNotActive implements Exception {
@@ -55,7 +55,7 @@ class MockIsNotActive implements Exception {
   MockIsNotActive(this.interceptor);
 
   @override
-  String toString() => "Request ${interceptor} is not active";
+  String toString() => 'Request $interceptor is not active';
 }
 
 class UnknownBodyType implements Exception {
@@ -64,7 +64,7 @@ class UnknownBodyType implements Exception {
   UnknownBodyType(this.body);
 
   @override
-  String toString() => "Unknown body type ${body.runtimeType}";
+  String toString() => 'Unknown body type ${body.runtimeType}';
 }
 
 class UnknownQueryMatcherType implements Exception {
@@ -73,5 +73,5 @@ class UnknownQueryMatcherType implements Exception {
   UnknownQueryMatcherType(this.query);
 
   @override
-  String toString() => "Unknown query matcher type ${query.runtimeType}";
+  String toString() => 'Unknown query matcher type ${query.runtimeType}';
 }
