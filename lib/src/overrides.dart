@@ -147,7 +147,7 @@ class MockClient implements HttpClient {
   Function(String line)? keyLog;
 }
 
-class MockHttpClientRequest extends HttpClientRequest {
+class MockHttpClientRequest implements HttpClientRequest {
   @override
   final String method;
 
@@ -159,6 +159,21 @@ class MockHttpClientRequest extends HttpClientRequest {
 
   @override
   late Encoding encoding;
+
+  @override
+  bool bufferOutput = true;
+
+  @override
+  int contentLength = -1;
+
+  @override
+  bool followRedirects = true;
+
+  @override
+  int maxRedirects = 5;
+
+  @override
+  bool persistentConnection = true;
 
   final body = <int>[];
 
