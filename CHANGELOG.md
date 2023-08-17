@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2.3
+
+- Dart 3.1 support
+
+## 1.2.2
+
+- Added response delay to interceptor
+
 ## 1.2.1
 
 - Dart 2.17 support
